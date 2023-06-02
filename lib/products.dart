@@ -1,4 +1,3 @@
-import 'package:business_application/home.dart';
 import 'package:flutter/material.dart';
 import 'sqldb.dart';
 
@@ -18,7 +17,8 @@ class _ProductsState extends State<Products> {
   }
 
   void fetchProductList() async {
-    List<Map> response = await sqlDb.readData("SELECT * FROM 'products' ORDER BY id DESC ");
+    List<Map> response =
+        await sqlDb.readData("SELECT * FROM 'products' ORDER BY id DESC ");
     setState(() {
       productList = response;
     });
@@ -39,6 +39,7 @@ class _ProductsState extends State<Products> {
       fetchProductList();
     }
   }
+
   void update(id, name, wholesalePrice, salePrice) async {
     int response = await sqlDb.updateData(
         "UPDATE products SET name = '$name', wholesalePrice = $wholesalePrice, salePrice = $salePrice WHERE id = $id");
@@ -46,18 +47,23 @@ class _ProductsState extends State<Products> {
       fetchProductList();
     }
   }
+
   void getOneProduct(id) async {
     List<Map> response =
-    await sqlDb.readData("SELECT * FROM 'Products' where id = $id ");
+        await sqlDb.readData("SELECT * FROM 'Products' where id = $id ");
     setState(() {
       productList = response;
     });
   }
 
-  _displayDialog(BuildContext context, $id,$name,$wholesalePrice,$salePrice,$flag) async {
-    TextEditingController productNameController = TextEditingController(text: $name);
-    TextEditingController wholesalePriceController = TextEditingController(text: $wholesalePrice);
-    TextEditingController salePriceController = TextEditingController(text: $salePrice);
+  _displayDialog(BuildContext context, $id, $name, $wholesalePrice, $salePrice,
+      $flag) async {
+    TextEditingController productNameController =
+        TextEditingController(text: $name);
+    TextEditingController wholesalePriceController =
+        TextEditingController(text: $wholesalePrice);
+    TextEditingController salePriceController =
+        TextEditingController(text: $salePrice);
 
     return showDialog(
         context: context,
@@ -71,17 +77,21 @@ class _ProductsState extends State<Products> {
           Widget confirmButton = TextButton(
             child: Text("Ok"),
             onPressed: () {
-              if($flag == 'store'){
-                store(productNameController.text.toString(),wholesalePriceController.text,salePriceController.text);
-              }else{
-                update($id,productNameController.text.toString(),wholesalePriceController.text,salePriceController.text);
+              if ($flag == 'store') {
+                store(productNameController.text.toString(),
+                    wholesalePriceController.text, salePriceController.text);
+              } else {
+                update($id, productNameController.text.toString(),
+                    wholesalePriceController.text, salePriceController.text);
                 print("updted");
               }
               Navigator.of(context).pop();
             },
           );
           return AlertDialog(
-            title: $flag =='store' ? Text('Insert Product'):Text('Update Product'),
+            title: $flag == 'store'
+                ? Text('Insert Product')
+                : Text('Update Product'),
             content: SingleChildScrollView(
               child: Column(
                 children: [
@@ -92,7 +102,7 @@ class _ProductsState extends State<Products> {
                   TextField(
                     controller: wholesalePriceController,
                     decoration:
-                    InputDecoration(hintText: "Enter wholesalePrice"),
+                        InputDecoration(hintText: "Enter wholesalePrice"),
                     keyboardType: TextInputType.number,
                   ),
                   TextField(
@@ -111,122 +121,128 @@ class _ProductsState extends State<Products> {
         });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-          print('sdsdf');
           return true;
         },
-    child: Scaffold(
-      appBar: AppBar(
-        title: Text('Products Page'),
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back),
-          onPressed: (){
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context)=> MyCustomPage()
-          ));
-            }
-      )
-      ),
-      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () async{
-                _displayDialog(context,null,null,null,null,'store');
-              },
-              child: Text('Add Product'),
+        child: Scaffold(
+          appBar: AppBar(
+              title: Text('Products Page'),
+              leading: new IconButton(
+                  icon: new Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false);
+                  })),
+          body:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    _displayDialog(context, null, null, null, null, 'store');
+                  },
+                  child: Text('Add Product'),
+                ),
+              ],
             ),
-          ],
-        ),
-        SizedBox(height: 16.0),
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                      label: Text(
-                    'ID',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Name',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Price',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Sale Price',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Action',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                ],
-                rows: [
-                  for (var product in productList)
-                    DataRow(cells: [
-                      DataCell(Text(product['id'].toString(),
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold))),
-                      DataCell(Text(
-                        product['name'].toString(),
+            SizedBox(height: 16.0),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: DataTable(
+                    columns: [
+                      DataColumn(
+                          label: Text(
+                        'ID',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       )),
-                      DataCell(Text(
-                        product['wholesalePrice'].toString(),
-                        textAlign: TextAlign.center,
+                      DataColumn(
+                          label: Text(
+                        'Name',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       )),
-                      DataCell(Text(
-                        product['salePrice'].toString(),
-                        textAlign: TextAlign.center,
+                      DataColumn(
+                          label: Text(
+                        'Price',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       )),
-                      DataCell(
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              onPressed: () async {
-                                delete(product['id']);
-                              },
-                              icon: Icon(Icons.delete),
-                              color: Colors.red,
+                      DataColumn(
+                          label: Text(
+                        'Sale Price',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Action',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      )),
+                    ],
+                    rows: [
+                      for (var product in productList)
+                        DataRow(cells: [
+                          DataCell(Text(product['id'].toString(),
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold))),
+                          DataCell(Text(
+                            product['name'].toString(),
+                            textAlign: TextAlign.center,
+                          )),
+                          DataCell(Text(
+                            product['wholesalePrice'].toString(),
+                            textAlign: TextAlign.center,
+                          )),
+                          DataCell(Text(
+                            product['salePrice'].toString(),
+                            textAlign: TextAlign.center,
+                          )),
+                          DataCell(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  onPressed: () async {
+                                    delete(product['id']);
+                                  },
+                                  icon: Icon(Icons.delete),
+                                  color: Colors.red,
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    _displayDialog(
+                                        context,
+                                        product['id'],
+                                        product['name'],
+                                        product['wholesalePrice'].toString(),
+                                        product['salePrice'].toString(),
+                                        'update');
+                                    print(product['name']);
+                                  },
+                                  icon: Icon(Icons.edit),
+                                  color: Colors.blue,
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              onPressed: () async {
-                                  _displayDialog(context,product['id'] ,product['name'], product['wholesalePrice'].toString(), product['salePrice'].toString(),'update');
-                                  print(product['name']);
-                              },
-                              icon: Icon(Icons.edit),
-                              color: Colors.blue,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
-                ],
+                          ),
+                        ]),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        )
-      ]),
-    )
-    );
+            )
+          ]),
+        ));
   }
 }

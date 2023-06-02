@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:business_application/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,86 +46,80 @@ class _DailyReportState extends State<DailyReport> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-      return true;
-    },
-    child: Scaffold(
-      appBar: AppBar(
-          title: Text('Daily Report'),
-          leading: new IconButton(
-              icon: new Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MyCustomPage()));
-              })),
-      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Card(
-                  margin: EdgeInsets.all(10),
-                  color: Colors.white,
-                  shadowColor: Colors.grey,
-                  elevation: 2,
-                  child: DataTable(
-                    headingRowColor:
-                    MaterialStateColor.resolveWith((states) => Colors.grey.shade800),
-                    columns: [
-                      DataColumn(
-                          label: Text(
-                        'Data',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          color:Colors.white
-                        ),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Value',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color:Colors.white
-                        ),
-
-                      )),
-                    ],
-                    rows: [
-                      DataRow(cells: [
-                        DataCell(Text('Date',
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+              title: Text('Daily Report'),
+              leading: new IconButton(
+                  icon: new Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) => Home()));
+                  })),
+          body:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      margin: EdgeInsets.all(10),
+                      color: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 2,
+                      child: DataTable(
+                        headingRowColor: MaterialStateColor.resolveWith(
+                            (states) => Colors.grey.shade800),
+                        columns: [
+                          DataColumn(
+                              label: Text(
+                            'Data',
                             style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold))),
-                        DataCell(Text(
-                          '2023-06-01',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )),
+                          DataColumn(
+                              label: Text(
+                            'Value',
                             style: TextStyle(
-                              fontSize: 15,
-                            )
-                        )),
-                      ]),
-                      DataRow(cells: [
-                        DataCell(Text('Total Daliy Sales',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold
-                            ))),
-                        DataCell(Text(
-                          '500',
-                            style: TextStyle(
-                                fontSize: 15,
-                            )
-                        )),
-                      ]),
-                    ],
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )),
+                        ],
+                        rows: [
+                          DataRow(cells: [
+                            DataCell(Text('Date',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold))),
+                            DataCell(Text('2023-06-01',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ))),
+                          ]),
+                          DataRow(cells: [
+                            DataCell(Text('Total Daliy Sales',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold))),
+                            DataCell(Text('500',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ))),
+                          ]),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ]),
-    ));
+            ),
+          ]),
+        ));
   }
 }

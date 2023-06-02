@@ -73,12 +73,12 @@ import 'navdrawer.dart';
     );
   }
 }*/
-class MyCustomPage extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _MyCustomPageState createState() => _MyCustomPageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyCustomPageState extends State<MyCustomPage> {
+class _HomeState extends State<Home> {
   SqlDb sqlDb = SqlDb();
   List<Map> productList = [];
   List<Map> salesList = [];
@@ -195,7 +195,7 @@ class _MyCustomPageState extends State<MyCustomPage> {
                   if (_text.text == 'sure') {
                     delete($id);
                     Navigator.of(context).pop();
-                  } else if(_text.text != 'sure') {
+                  } else if (_text.text != 'sure') {
                     setState(() {
                       _validate = true;
                     });
@@ -253,7 +253,6 @@ class _MyCustomPageState extends State<MyCustomPage> {
       appBar: AppBar(
         title: Text('My Custom Page'),
       ),
-      
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
