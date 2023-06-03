@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:business_application/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'constants.dart';
 import 'sqldb.dart';
 
 class DailyReport extends StatefulWidget {
@@ -13,6 +14,11 @@ class _DailyReportState extends State<DailyReport> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
   var totalMoney;
+  Color tableHeaderColor = Constants.tableHeaderColor;
+  Color tableHeaderTitleColor = Constants.white;
+  double tableContentFontSize = Constants.tableContentFontSize;
+  double tableTitleFontSize = Constants.tableTitleFontSize;
+  static const double paddingSize = Constants.padding;
 
   @override
   void initState() {
@@ -61,24 +67,24 @@ class _DailyReportState extends State<DailyReport> {
           body:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(paddingSize),
               child: Row(
                 children: [
                   Expanded(
                     child: Card(
-                      margin: EdgeInsets.all(10),
-                      color: Colors.white,
+                      margin: EdgeInsets.all(paddingSize),
+                      color: tableHeaderTitleColor,
                       shadowColor: Colors.grey,
                       elevation: 2,
                       child: DataTable(
                         headingRowColor: MaterialStateColor.resolveWith(
-                            (states) => Colors.grey.shade800),
+                            (states) => tableHeaderColor),
                         columns: [
                           DataColumn(
                               label: Text(
                             'Data',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: tableTitleFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           )),
@@ -86,30 +92,31 @@ class _DailyReportState extends State<DailyReport> {
                               label: Text(
                             'Value',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: tableTitleFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white),
                           )),
                         ],
                         rows: [
                           DataRow(cells: [
+
                             DataCell(Text('Date',
                                 style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: tableTitleFontSize,
                                     fontWeight: FontWeight.bold))),
                             DataCell(Text('2023-06-01',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: tableTitleFontSize,
                                 ))),
                           ]),
                           DataRow(cells: [
                             DataCell(Text('Total Daliy Sales',
                                 style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: tableContentFontSize,
                                     fontWeight: FontWeight.bold))),
                             DataCell(Text('500',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: tableContentFontSize,
                                 ))),
                           ]),
                         ],

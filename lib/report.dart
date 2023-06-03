@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'constants.dart';
 import 'sqldb.dart';
 
 class Report extends StatefulWidget {
@@ -11,6 +12,12 @@ class _ReportState extends State<Report> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
   var totalMoney;
+  Color tableHeaderColor = Constants.tableHeaderColor;
+  Color tableHeaderTitleColor = Constants.white;
+  Color primaryColor = Constants.blue;
+  double tableContentFontSize = Constants.tableContentFontSize;
+  double tableTitleFontSize = Constants.tableTitleFontSize;
+  static const double paddingSize = Constants.padding;
 
   @override
   void initState() {
@@ -66,8 +73,8 @@ class _ReportState extends State<Report> {
                     flex: 2,
                     child: Card(
                       margin: EdgeInsets.all(10),
-                      color: Colors.lightBlue,
-                      shadowColor: Colors.blueGrey,
+                      color: primaryColor,
+                      shadowColor: Colors.grey,
                       elevation: 2,
                       child: Column(
                         children: <Widget>[
@@ -76,6 +83,7 @@ class _ReportState extends State<Report> {
                                 Icon(Icons.paid, color: Colors.white, size: 45),
                             title: Text(
                               "Total Money: $totalMoney",
+
                               style: TextStyle(
                                   fontSize: 25,
                                   fontWeight: FontWeight.bold,
@@ -89,51 +97,63 @@ class _ReportState extends State<Report> {
                 ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: DataTable(
-                    columns: [
-                      DataColumn(
-                          label: Text(
-                        'Date',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Total Products',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Total price',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                    ],
-                    rows: [
-                      for (var row in reportList)
-                        DataRow(cells: [
-                          DataCell(Text(row['date'].toString())),
-                          DataCell(Text(
-                            row['products_count'].toString(),
-                            textAlign: TextAlign.center,
-                          )),
-                          DataCell(Text(
-                            row['price_sum'].toString(),
-                            textAlign: TextAlign.center,
-                          )),
-                        ]),
-                    ],
+                Expanded(
+
+                  child: SingleChildScrollView(
+
+                    scrollDirection: Axis.vertical,
+                    child: Card(
+                        margin: EdgeInsets.all(paddingSize),
+                        color: tableHeaderTitleColor,
+                        shadowColor: Colors.grey,
+                        elevation: 2,
+                        child: DataTable(
+                          headingRowColor: MaterialStateColor.resolveWith(
+                                  (states) => tableHeaderColor),
+                          columns: [
+                            DataColumn(
+                                label: Text(
+                                  'Date',
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                                  textAlign: TextAlign.center,
+                                )),
+                            DataColumn(
+                                label: Text(
+                                  'Total \nProducts',
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                                )),
+                            DataColumn(
+                                label: Text(
+                                  'Daily \nSales',
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                                )),
+                          ],
+                          rows: [
+                            for (var row in reportList)
+                              DataRow(cells: [
+                                DataCell(Text(row['date'].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: tableContentFontSize),
+                                )),
+                                DataCell(Text(
+                                  row['products_count'].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: tableContentFontSize),
+                                )),
+                                DataCell(Text(
+                                  row['price_sum'].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: tableContentFontSize),
+                                )),
+                              ]),
+                          ],
+                        )),
                   ),
                 ),
-              ),
-            )
+
           ]),
         ));
   }

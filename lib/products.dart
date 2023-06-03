@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'constants.dart';
 import 'sqldb.dart';
 
 class Products extends StatefulWidget {
@@ -9,6 +10,15 @@ class Products extends StatefulWidget {
 class _ProductsState extends State<Products> {
   SqlDb sqlDb = SqlDb();
   List<Map> productList = [];
+  bool _nameValidate = false;
+  bool _wholesalePriceValidate = false;
+  bool _salePriceValidate = false;
+  bool _deleteValidate = false;
+  Color tableHeaderColor = Constants.tableHeaderColor;
+  Color tableHeaderTitleColor = Constants.white;
+  double tableContentFontSize = Constants.tableContentFontSize;
+  double tableTitleFontSize = Constants.tableTitleFontSize;
+  static const double paddingSize = Constants.padding;
 
   @override
   void initState() {
@@ -68,56 +78,132 @@ class _ProductsState extends State<Products> {
     return showDialog(
         context: context,
         builder: (context) {
-          Widget backButton = TextButton(
-            child: Text("Cancel"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          );
-          Widget confirmButton = TextButton(
-            child: Text("Ok"),
-            onPressed: () {
-              if ($flag == 'store') {
-                store(productNameController.text.toString(),
-                    wholesalePriceController.text, salePriceController.text);
-              } else {
-                update($id, productNameController.text.toString(),
-                    wholesalePriceController.text, salePriceController.text);
-                print("updted");
-              }
-              Navigator.of(context).pop();
-            },
-          );
-          return AlertDialog(
-            title: $flag == 'store'
-                ? Text('Insert Product')
-                : Text('Update Product'),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: productNameController,
-                    decoration: InputDecoration(hintText: "Enter Product name"),
-                  ),
-                  TextField(
-                    controller: wholesalePriceController,
-                    decoration:
-                        InputDecoration(hintText: "Enter wholesalePrice"),
-                    keyboardType: TextInputType.number,
-                  ),
-                  TextField(
-                    controller: salePriceController,
-                    decoration: InputDecoration(hintText: "Enter sale price"),
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
+          return StatefulBuilder(builder: (context, setState) {
+            Widget backButton = TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            );
+            Widget confirmButton = TextButton(
+              child: Text("Ok"),
+              onPressed: () {
+                if (productNameController.text.isEmpty ||
+                    wholesalePriceController.text.isEmpty ||
+                    salePriceController.text.isEmpty) {
+                  setState(() {
+                    _nameValidate = productNameController.text.isEmpty;
+                    _wholesalePriceValidate =
+                        wholesalePriceController.text.isEmpty;
+                    _salePriceValidate = salePriceController.text.isEmpty;
+                  });
+                } else {
+                  if ($flag == 'store') {
+                    store(
+                        productNameController.text.toString(),
+                        wholesalePriceController.text,
+                        salePriceController.text);
+                  } else {
+                    update(
+                        $id,
+                        productNameController.text.toString(),
+                        wholesalePriceController.text,
+                        salePriceController.text);
+                  }
+                  Navigator.of(context).pop();
+                }
+              },
+            );
+            return AlertDialog(
+              title: $flag == 'store'
+                  ? Text('Insert Product')
+                  : Text('Update Product'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: productNameController,
+                      decoration: InputDecoration(
+                        hintText: "Enter Product name",
+                        errorText: _nameValidate ? "Can`t Be Empty" : null,
+                      ),
+                    ),
+                    TextField(
+                      controller: wholesalePriceController,
+                      decoration: InputDecoration(
+                        hintText: "Enter wholesalePrice",
+                        errorText:
+                            _wholesalePriceValidate ? "Can`t Be Empty" : null,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    TextField(
+                      controller: salePriceController,
+                      decoration: InputDecoration(
+                        hintText: "Enter sale price",
+                        errorText: _salePriceValidate ? "Can`t Be Empty" : null,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            actions: [
-              backButton,
-              confirmButton,
-            ],
-          );
+              actions: [
+                backButton,
+                confirmButton,
+              ],
+            );
+          });
+        });
+  }
+
+  _displayDeleteDialog(BuildContext context, $id) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            TextEditingController _text =
+                TextEditingController(); // Create a new TextEditingController
+            Widget backButton = TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            );
+            Widget confirmButton = TextButton(
+                child: Text("Ok"),
+                onPressed: () {
+                  if (_text.text == 'sure') {
+                    delete($id);
+                    Navigator.of(context).pop();
+                  } else if (_text.text != 'sure') {
+                    setState(() {
+                      _deleteValidate = true;
+                    });
+                  }
+                });
+            return AlertDialog(
+              title: Text('Delete Product'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _text,
+                      decoration: InputDecoration(
+                        hintText: "Enter \'sure\'",
+                        errorText:
+                            _deleteValidate ? "Please Write \'sure\'" : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                backButton,
+                confirmButton,
+              ],
+            );
+          });
         });
   }
 
@@ -156,92 +242,105 @@ class _ProductsState extends State<Products> {
                 scrollDirection: Axis.horizontal,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: DataTable(
-                    columns: [
-                      DataColumn(
-                          label: Text(
-                        'ID',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Name',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Price',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Sale Price',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Action',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )),
-                    ],
-                    rows: [
-                      for (var product in productList)
-                        DataRow(cells: [
-                          DataCell(Text(product['id'].toString(),
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold))),
-                          DataCell(Text(
-                            product['name'].toString(),
-                            textAlign: TextAlign.center,
-                          )),
-                          DataCell(Text(
-                            product['wholesalePrice'].toString(),
-                            textAlign: TextAlign.center,
-                          )),
-                          DataCell(Text(
-                            product['salePrice'].toString(),
-                            textAlign: TextAlign.center,
-                          )),
-                          DataCell(
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () async {
-                                    delete(product['id']);
-                                  },
-                                  icon: Icon(Icons.delete),
-                                  color: Colors.red,
+                  child: Card(
+                      margin: EdgeInsets.all(paddingSize),
+                      color: tableHeaderTitleColor,
+                      shadowColor: Colors.grey,
+                      elevation: 2,
+                      child: DataTable(
+                        headingRowColor: MaterialStateColor.resolveWith(
+                            (states) => tableHeaderColor),
+                        columns: [
+                          DataColumn(
+                              label: Text(
+                                'Name',
+                                style: TextStyle(
+                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                              )),
+                          DataColumn(
+                              label: Text(
+                                'Price',
+                                style: TextStyle(
+                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                              )),
+                          DataColumn(
+                              label: Text(
+                                'Sale Price',
+                                style: TextStyle(
+                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                              )),
+                          DataColumn(
+                              label: Text(
+                                'Action',
+                                style: TextStyle(
+                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
+                              )),
+                        ],
+                        rows: [
+                          for (var product in productList)
+                            DataRow(cells: [
+                              DataCell(Text(
+                                product['name'].toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: tableContentFontSize),
+                              )),
+                              DataCell(Text(
+                                product['wholesalePrice'].toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: tableContentFontSize),
+                              )),
+                              DataCell(Text(
+                                product['salePrice'].toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: tableContentFontSize),
+                              )),
+                              DataCell(
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        _deleteValidate = false;
+                                        _displayDeleteDialog(
+                                            context, product['id']);
+                                      },
+                                      icon: Icon(Icons.delete),
+                                      color: Colors.red,
+                                    ),
+                                    VerticalDivider(
+                                      thickness: 0.7,
+                                      color: Colors.grey,
+                                      indent: 10,
+                                      endIndent:10,
+                                      width: 5,
+                                    ),
+
+                                    IconButton(
+                                      onPressed: () async {
+                                        _nameValidate = false;
+                                        _wholesalePriceValidate = false;
+                                        _salePriceValidate = false;
+                                        _displayDialog(
+                                            context,
+                                            product['id'],
+                                            product['name'],
+                                            product['wholesalePrice'].toString(),
+                                            product['salePrice'].toString(),
+                                            'update');
+                                        print(product['name']);
+                                      },
+                                      icon: Icon(Icons.edit),
+                                      color: Colors.blue,
+                                    ),
+                                  ],
                                 ),
-                                IconButton(
-                                  onPressed: () async {
-                                    _displayDialog(
-                                        context,
-                                        product['id'],
-                                        product['name'],
-                                        product['wholesalePrice'].toString(),
-                                        product['salePrice'].toString(),
-                                        'update');
-                                    print(product['name']);
-                                  },
-                                  icon: Icon(Icons.edit),
-                                  color: Colors.blue,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ]),
-                    ],
-                  ),
+                              ),
+                            ]),
+                        ],
+                      )),
                 ),
               ),
-            )
+            ),
           ]),
         ));
   }

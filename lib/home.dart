@@ -1,78 +1,8 @@
 import 'package:flutter/material.dart';
 import 'sqldb.dart';
 import 'navdrawer.dart';
+import 'constants.dart';
 
-/*class MyCustomPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Custom Page'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Button 1'),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Button 2'),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Button 3'),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.0),
-          DataTable(
-            columns: [
-              DataColumn(label: Text(
-                  'ID',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-              )),
-              DataColumn(label: Text(
-                  'Name',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-              )),
-              DataColumn(label: Text(
-                  'Profession',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-              )),
-            ], rows: [
-            DataRow(cells: [
-              DataCell(Text('1')),
-              DataCell(Text('Stephen')),
-              DataCell(Text('Actor')),
-            ]),
-            DataRow(cells: [
-              DataCell(Text('5')),
-              DataCell(Text('John')),
-              DataCell(Text('Student')),
-            ]),
-            DataRow(cells: [
-              DataCell(Text('10')),
-              DataCell(Text('Harry')),
-              DataCell(Text('Leader')),
-            ]),
-            DataRow(cells: [
-              DataCell(Text('15')),
-              DataCell(Text('Peter')),
-              DataCell(Text('Scientist')),
-            ]),
-          ],
-
-          ),
-        ],
-      ),
-    );
-  }
-}*/
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -83,6 +13,13 @@ class _HomeState extends State<Home> {
   List<Map> productList = [];
   List<Map> salesList = [];
   bool _validate = false;
+  Color tableHeaderColor = Constants.tableHeaderColor;
+  Color tableHeaderTitleColor = Constants.white;
+  Color deleteButtonColor = Constants.red;
+  Color editButtonColor = Constants.blue;
+  double tableContentFontSize = Constants.tableContentFontSize;
+  double tableTitleFontSize = Constants.tableTitleFontSize;
+  static const double paddingSize = Constants.padding;
 
   @override
   void initState() {
@@ -141,6 +78,7 @@ class _HomeState extends State<Home> {
     return showDialog(
         context: context,
         builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
           Widget backButton = TextButton(
             child: Text("Cancel"),
             onPressed: () {
@@ -150,8 +88,14 @@ class _HomeState extends State<Home> {
           Widget confirmButton = TextButton(
             child: Text("Ok"),
             onPressed: () {
-              update($id, salePriceController.text);
-              Navigator.of(context).pop();
+              if (salePriceController.text.isEmpty) {
+                setState(() {
+                  _validate = true;
+                });
+              } else{
+                update($id, salePriceController.text);
+                Navigator.of(context).pop();
+              }
             },
           );
           return AlertDialog(
@@ -161,8 +105,11 @@ class _HomeState extends State<Home> {
                 children: [
                   TextField(
                     controller: salePriceController,
-                    decoration: InputDecoration(hintText: "Enter sold price"),
+                    decoration: InputDecoration(hintText: "Enter sold price",
+                      errorText: _validate ? "Can`t Be Empty" : null,
+                    ),
                     keyboardType: TextInputType.number,
+
                   ),
                 ],
               ),
@@ -172,6 +119,7 @@ class _HomeState extends State<Home> {
               confirmButton,
             ],
           );
+          });
         });
   }
 
@@ -180,8 +128,7 @@ class _HomeState extends State<Home> {
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
-            TextEditingController _text =
-                TextEditingController(); // Create a new TextEditingController
+            TextEditingController _text = TextEditingController(); // Create a new TextEditingController
             Widget backButton = TextButton(
               child: Text("Cancel"),
               onPressed: () {
@@ -191,7 +138,6 @@ class _HomeState extends State<Home> {
             Widget confirmButton = TextButton(
                 child: Text("Ok"),
                 onPressed: () {
-                  print(_validate);
                   if (_text.text == 'sure') {
                     delete($id);
                     Navigator.of(context).pop();
@@ -209,7 +155,7 @@ class _HomeState extends State<Home> {
                     TextField(
                       controller: _text,
                       decoration: InputDecoration(
-                        hintText: "Enter product name",
+                        hintText: "Enter \'sure\'",
                         errorText: _validate ? "Please Write \'sure\'" : null,
                       ),
                     ),
@@ -251,7 +197,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: NavDrawer(),
       appBar: AppBar(
-        title: Text('My Custom Page'),
+        title: Text('Home Page'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -259,71 +205,89 @@ class _HomeState extends State<Home> {
           ...rows,
           SizedBox(height: 16.0),
           Expanded(
+
             child: SingleChildScrollView(
+
               scrollDirection: Axis.vertical,
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                      label: Text(
-                    'ID',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Card(
+                  margin: EdgeInsets.all(paddingSize),
+                  color: tableHeaderTitleColor,
+                  shadowColor: Colors.grey,
+                  elevation: 2,
+                  child: DataTable(
+                      headingRowColor: MaterialStateColor.resolveWith(
+                      (states) => tableHeaderColor),
+                      columns: [
+                        DataColumn(
+                                label: Text(
+                                  'Name',
+                                  style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
+                                      color: tableHeaderTitleColor
+                                  ),
+                                )),
+                        DataColumn(
+                                label: Text(
+                                  'Price',
+                                  style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
+                                      color: tableHeaderTitleColor
+                                  ),
+                                )),
+                        DataColumn(
+                                label: Text(
+                                  'Action',
+                                  style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
+                                      color: tableHeaderTitleColor
+                                  ),
+                                )),
+                      ],
+              rows: [
+                for (var sale in salesList)
+                  DataRow(
+                      cells: [
+                  DataCell(Text(
+                      sale['name'].toString(),
+                    style: TextStyle(fontSize: tableContentFontSize),
                     textAlign: TextAlign.center,
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Name',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Price',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
-                      label: Text(
-                    'Action',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-                ],
-                rows: [
-                  for (var sale in salesList)
-                    DataRow(cells: [
-                      DataCell(Text(sale['id'].toString(),
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold))),
-                      DataCell(Text(
-                        sale['name'].toString(),
-                        textAlign: TextAlign.center,
-                      )),
-                      DataCell(Text(
-                        sale['sold_price'].toString(),
-                        textAlign: TextAlign.center,
-                      )),
-                      DataCell(
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              onPressed: () async {
-                                _displayDeleteDialog(context, sale['id']);
-                              },
-                              icon: Icon(Icons.delete),
-                              color: Colors.red,
-                            ),
-                            IconButton(
-                              onPressed: () async {
-                                _displayDialog(context, sale['id'],
-                                    sale['sold_price'].toString());
-                              },
-                              icon: Icon(Icons.edit),
-                              color: Colors.blue,
-                            ),
-                          ],
-                        ),
+                    )),
+                    DataCell(Text(
+                      sale['sold_price'].toString(),
+                      style: TextStyle(fontSize: tableContentFontSize),
+                      textAlign: TextAlign.center,
+                    )),
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () async {
+                              _validate =false;
+                              _displayDeleteDialog(context, sale['id']);
+                            },
+                            icon: Icon(Icons.delete),
+                            color: Colors.red,
+                          ),
+                          VerticalDivider(
+                            thickness: 0.7,
+                            color: Colors.grey,
+                            indent: 10,
+                            endIndent:10,
+                            width: 5,
+                          ),
+                          IconButton(
+                            alignment: Alignment.centerLeft,
+                            onPressed: () async {
+                              _validate = false;
+                              _displayDialog(context, sale['id'],
+                                  sale['sold_price'].toString());
+                            },
+                            icon: Icon(Icons.edit),
+                            color: Colors.blue,
+                          ),
+                        ],
                       ),
-                    ]),
-                ],
-              ),
+                    ),
+                  ]),
+              ],
+                )),
             ),
           ),
         ],
