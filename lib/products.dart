@@ -259,13 +259,13 @@ class _ProductsState extends State<Products> {
                               )),
                           DataColumn(
                               label: Text(
-                                'Price',
+                                'Wholesale\nPrice',
                                 style: TextStyle(
                                     fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
                               )),
                           DataColumn(
                               label: Text(
-                                'Sale Price',
+                                'Sale\nPrice',
                                 style: TextStyle(
                                     fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
                               )),

@@ -13,7 +13,8 @@ class DailyReport extends StatefulWidget {
 class _DailyReportState extends State<DailyReport> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
-  var totalMoney;
+  List<Map> sellingProducts = [];
+  var totalMoney ,wholesalePrice,netProfit,sellingPrice;
   Color tableHeaderColor = Constants.tableHeaderColor;
   Color tableHeaderTitleColor = Constants.white;
   double tableContentFontSize = Constants.tableContentFontSize;
@@ -25,6 +26,8 @@ class _DailyReportState extends State<DailyReport> {
     super.initState();
     fetchMonthlyReport();
     fetchTotalMoney();
+    getSellingProductDate();
+    getIMoneyData();
   }
 
   void fetchMonthlyReport() async {
@@ -47,6 +50,34 @@ class _DailyReportState extends State<DailyReport> {
       totalMoney = response.first['price_sum'];
     });
   }
+  void getIMoneyData() async{
+    var response = await sqlDb.readData(
+      "SELECT sum(sold_price) AS selling_price,"
+      "sum(products.wholesalePrice) AS wholesale_price,"
+      "sum(sold_price)- sum(products.wholesalePrice)as net_profit "
+      "FROM sales "
+      "INNER JOIN products ON sales.product_id=products.id "
+      "WHERE DATE(sales.created_at) = Date('now','localtime')",
+    );
+    setState(() {
+      sellingPrice = response.first['selling_price'];
+      wholesalePrice = response.first['wholesale_price'];
+      netProfit = response.first['net_profit'];
+    });
+  }
+  void getSellingProductDate() async{
+    var response = await sqlDb.readData(
+        "SELECT products.name As name,"
+            "COUNT() AS number_of_selling "
+            "FROM sales "
+            "INNER JOIN products ON sales.product_id = products.id "
+            "WHERE DATE(sales.created_at) = Date('now','localtime') "
+            "GROUP BY product_id"
+    );
+    setState(() {
+      sellingProducts =response;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,67 +96,97 @@ class _DailyReportState extends State<DailyReport> {
                         .push(MaterialPageRoute(builder: (context) => Home()));
                   })),
           body:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Padding(
-              padding: const EdgeInsets.all(paddingSize),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Card(
-                      margin: EdgeInsets.all(paddingSize),
-                      color: tableHeaderTitleColor,
-                      shadowColor: Colors.grey,
-                      elevation: 2,
-                      child: DataTable(
-                        headingRowColor: MaterialStateColor.resolveWith(
-                            (states) => tableHeaderColor),
-                        columns: [
-                          DataColumn(
-                              label: Text(
-                            'Data',
-                            style: TextStyle(
-                                fontSize: tableTitleFontSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )),
-                          DataColumn(
-                              label: Text(
-                            'Value',
-                            style: TextStyle(
-                                fontSize: tableTitleFontSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )),
-                        ],
-                        rows: [
-                          DataRow(cells: [
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Card(
+                  margin: EdgeInsets.all(paddingSize),
+                  color: tableHeaderTitleColor,
+                  shadowColor: Colors.grey,
+                  elevation: 2,
+                  child: DataTable(
+          headingRowColor: MaterialStateColor.resolveWith(
+                  (states) => tableHeaderColor),
+          columns: [
+                DataColumn(
+                    label: Text(
+                  'Data',
+                  style: TextStyle(
+                      fontSize: tableTitleFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Value',
+                  style: TextStyle(
+                      fontSize: tableTitleFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                )),
+          ],
+          rows: [
+                DataRow(cells: [
 
-                            DataCell(Text('Date',
-                                style: TextStyle(
-                                    fontSize: tableTitleFontSize,
-                                    fontWeight: FontWeight.bold))),
-                            DataCell(Text('2023-06-01',
-                                style: TextStyle(
-                                  fontSize: tableTitleFontSize,
-                                ))),
-                          ]),
-                          DataRow(cells: [
-                            DataCell(Text('Total Daliy Sales',
-                                style: TextStyle(
-                                    fontSize: tableContentFontSize,
-                                    fontWeight: FontWeight.bold))),
-                            DataCell(Text('500',
-                                style: TextStyle(
-                                  fontSize: tableContentFontSize,
-                                ))),
-                          ]),
-                        ],
-                      ),
-                    ),
+                  DataCell(Text('Date',
+                      style: TextStyle(
+                          fontSize: tableTitleFontSize,
+                          fontWeight: FontWeight.bold))),
+                  DataCell(Text(DateTime.now().toIso8601String().split('T')[0],
+                      style: TextStyle(
+                        fontSize: tableTitleFontSize,
+                      ))),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text('Total Selling price',
+                      style: TextStyle(
+                          fontSize: tableTitleFontSize,
+                          fontWeight: FontWeight.bold))),
+                  DataCell(Text(sellingPrice.toString() != 'null' ? sellingPrice.toString() : '0',
+                      style: TextStyle(
+                        fontSize: tableContentFontSize,
+                      ))),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text('Total Wholesale Price',
+                      style: TextStyle(
+                          fontSize: tableContentFontSize,
+                          fontWeight: FontWeight.bold))),
+                  DataCell(Text(wholesalePrice.toString() != 'null' ? wholesalePrice.toString() : '0',
+                      style: TextStyle(
+                        fontSize: tableContentFontSize,
+                      ))),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text('Net Profit',
+                      style: TextStyle(
+                          fontSize: tableContentFontSize,
+                          fontWeight: FontWeight.bold))),
+                  DataCell(Text(netProfit.toString() != 'null' ? netProfit.toString() : '0',
+                      style: TextStyle(
+                        fontSize: tableContentFontSize,
+                      ))),
+                ]),
+            for (var index = 0; index < sellingProducts.length; index++)
+                DataRow(
+                    color: index == 0 ? MaterialStateColor.resolveWith((states) => Colors.lightGreen) : null,
+                    cells: [
+                  DataCell(Text(sellingProducts[index]['name'],
+                      style: TextStyle(
+                          fontSize: tableContentFontSize,
+                          fontWeight: FontWeight.bold))),
+                  DataCell(Text(sellingProducts[index]['number_of_selling'].toString(),
+                      style: TextStyle(
+                        fontSize: tableContentFontSize,
+                      ))),
+                ]),
+          ],
                   ),
-                ],
+                ),
               ),
             ),
+
           ]),
         ));
   }

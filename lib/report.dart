@@ -43,7 +43,7 @@ class _ReportState extends State<Report> {
       "SELECT SUM(sold_price) AS price_sum FROM sales",
     );
     setState(() {
-      totalMoney = response.first['price_sum'];
+      totalMoney = response.first['price_sum'] != null ? response.first['price_sum'] : 0;
     });
   }
 
@@ -82,7 +82,7 @@ class _ReportState extends State<Report> {
                             leading:
                                 Icon(Icons.paid, color: Colors.white, size: 45),
                             title: Text(
-                              "Total Money: $totalMoney",
+                              "Total Money: $totalMoney ",
 
                               style: TextStyle(
                                   fontSize: 25,

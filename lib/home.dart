@@ -41,6 +41,7 @@ class _HomeState extends State<Home> {
     SELECT sales.id as id, products.name as name, sales.sold_price
     FROM sales
     INNER JOIN products ON sales.product_id = products.id
+    WHERE DATE(sales.created_at) = Date('now','localtime')
     ORDER BY sales.id DESC
     ''');
     setState(() {
