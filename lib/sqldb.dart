@@ -26,7 +26,7 @@ class SqlDb {
     print("<=== onUpgrade ===>");
   }
 
-  _onCreate(Database db, int Version) async {
+  _onCreate(Database db, int version) async {
     await db.execute('''
     CREATE TABLE "products" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,

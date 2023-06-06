@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'constants.dart';
 import 'sqldb.dart';
 
@@ -56,7 +57,7 @@ class _ReportState extends State<Report> {
         },
         child: Scaffold(
           appBar: AppBar(
-              title: Text('Report'),
+              title: Text("report".tr().toString()),
               leading: new IconButton(
                   icon: new Icon(Icons.arrow_back),
                   onPressed: () {
@@ -82,7 +83,7 @@ class _ReportState extends State<Report> {
                             leading:
                                 Icon(Icons.paid, color: Colors.white, size: 45),
                             title: Text(
-                              "Total Money: $totalMoney ",
+                              "report".tr().toString() +":"+ " $totalMoney ",
 
                               style: TextStyle(
                                   fontSize: 25,
@@ -113,20 +114,20 @@ class _ReportState extends State<Report> {
                           columns: [
                             DataColumn(
                                 label: Text(
-                                  'Date',
+                                  "date".tr().toString(),
                                   style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
                                   textAlign: TextAlign.center,
                                 )),
                             DataColumn(
                                 label: Text(
-                                  'Total \nProducts',
+                                  "total_products".tr().toString(),
                                   style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
                                 )),
                             DataColumn(
                                 label: Text(
-                                  'Daily \nSales',
+                                  "daily_sales".tr().toString(),
                                   style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
                                 )),

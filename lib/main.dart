@@ -3,15 +3,29 @@ import 'package:business_application/home.dart';
 import 'package:business_application/products.dart';
 import 'package:business_application/report.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
-void main() {
-  runApp(MyApp());
+  runApp(
+    EasyLocalization(
+        supportedLocales: [Locale('en', 'US'), Locale('ar', 'SA')],
+        path: 'assets/translations', // <-- change the path of the translation files
+        fallbackLocale: Locale('en', 'US'),
+        saveLocale: true,
+        child: MyApp()
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       title: 'My App',
       routes: {
         '/': (context) => Home(),

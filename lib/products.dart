@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'constants.dart';
 import 'sqldb.dart';
 
@@ -80,13 +81,13 @@ class _ProductsState extends State<Products> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             Widget backButton = TextButton(
-              child: Text("Cancel"),
+              child: Text("cancel".tr().toString()),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             );
             Widget confirmButton = TextButton(
-              child: Text("Ok"),
+              child: Text("ok".tr().toString()),
               onPressed: () {
                 if (productNameController.text.isEmpty ||
                     wholesalePriceController.text.isEmpty ||
@@ -116,32 +117,37 @@ class _ProductsState extends State<Products> {
             );
             return AlertDialog(
               title: $flag == 'store'
-                  ? Text('Insert Product')
-                  : Text('Update Product'),
+                  ? Text("insert_product".tr().toString())
+                  : Text("update_product".tr().toString()),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
                     TextField(
                       controller: productNameController,
                       decoration: InputDecoration(
-                        hintText: "Enter Product name",
-                        errorText: _nameValidate ? "Can`t Be Empty" : null,
+                        hintText: "enter_product_name".tr().toString(),
+                        errorText: _nameValidate
+                            ? "can_not_be_empty".tr().toString()
+                            : null,
                       ),
                     ),
                     TextField(
                       controller: wholesalePriceController,
                       decoration: InputDecoration(
-                        hintText: "Enter wholesalePrice",
-                        errorText:
-                            _wholesalePriceValidate ? "Can`t Be Empty" : null,
+                        hintText: "enter_wholesale_price".tr().toString(),
+                        errorText: _wholesalePriceValidate
+                            ? "can_not_be_empty".tr().toString()
+                            : null,
                       ),
                       keyboardType: TextInputType.number,
                     ),
                     TextField(
                       controller: salePriceController,
                       decoration: InputDecoration(
-                        hintText: "Enter sale price",
-                        errorText: _salePriceValidate ? "Can`t Be Empty" : null,
+                        hintText: "enter_selling_price".tr().toString(),
+                        errorText: _salePriceValidate
+                            ? "can_not_be_empty".tr().toString()
+                            : null,
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -165,13 +171,13 @@ class _ProductsState extends State<Products> {
             TextEditingController _text =
                 TextEditingController(); // Create a new TextEditingController
             Widget backButton = TextButton(
-              child: Text("Cancel"),
+              child: Text("cancel".tr().toString()),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             );
             Widget confirmButton = TextButton(
-                child: Text("Ok"),
+                child: Text("ok".tr().toString()),
                 onPressed: () {
                   if (_text.text == 'sure') {
                     delete($id);
@@ -183,16 +189,17 @@ class _ProductsState extends State<Products> {
                   }
                 });
             return AlertDialog(
-              title: Text('Delete Product'),
+              title: Text("delete_product".tr().toString()),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
                     TextField(
                       controller: _text,
                       decoration: InputDecoration(
-                        hintText: "Enter \'sure\'",
-                        errorText:
-                            _deleteValidate ? "Please Write \'sure\'" : null,
+                        hintText: "enter_sure".tr().toString(),
+                        errorText: _deleteValidate
+                            ? "please_write_sure".tr().toString()
+                            : null,
                       ),
                     ),
                   ],
@@ -216,7 +223,7 @@ class _ProductsState extends State<Products> {
         },
         child: Scaffold(
           appBar: AppBar(
-              title: Text('Products Page'),
+              title: Text("products".tr().toString()),
               leading: new IconButton(
                   icon: new Icon(Icons.arrow_back),
                   onPressed: () {
@@ -232,7 +239,7 @@ class _ProductsState extends State<Products> {
                   onPressed: () async {
                     _displayDialog(context, null, null, null, null, 'store');
                   },
-                  child: Text('Add Product'),
+                  child: Text("add_product".tr().toString()),
                 ),
               ],
             ),
@@ -253,28 +260,36 @@ class _ProductsState extends State<Products> {
                         columns: [
                           DataColumn(
                               label: Text(
-                                'Name',
-                                style: TextStyle(
-                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
-                              )),
+                            "name".tr().toString(),
+                            style: TextStyle(
+                                fontSize: tableTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: tableHeaderTitleColor),
+                          )),
                           DataColumn(
                               label: Text(
-                                'Wholesale\nPrice',
-                                style: TextStyle(
-                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
-                              )),
+                            "wholesale_price".tr().toString(),
+                            style: TextStyle(
+                                fontSize: tableTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: tableHeaderTitleColor),
+                          )),
                           DataColumn(
                               label: Text(
-                                'Sale\nPrice',
-                                style: TextStyle(
-                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
-                              )),
+                            "selling_price".tr().toString(),
+                            style: TextStyle(
+                                fontSize: tableTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: tableHeaderTitleColor),
+                          )),
                           DataColumn(
                               label: Text(
-                                'Action',
-                                style: TextStyle(
-                                    fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,color: tableHeaderTitleColor),
-                              )),
+                            "action".tr().toString(),
+                            style: TextStyle(
+                                fontSize: tableTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: tableHeaderTitleColor),
+                          )),
                         ],
                         rows: [
                           for (var product in productList)
@@ -282,17 +297,20 @@ class _ProductsState extends State<Products> {
                               DataCell(Text(
                                 product['name'].toString(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: tableContentFontSize),
+                                style:
+                                    TextStyle(fontSize: tableContentFontSize),
                               )),
                               DataCell(Text(
                                 product['wholesalePrice'].toString(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: tableContentFontSize),
+                                style:
+                                    TextStyle(fontSize: tableContentFontSize),
                               )),
                               DataCell(Text(
                                 product['salePrice'].toString(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: tableContentFontSize),
+                                style:
+                                    TextStyle(fontSize: tableContentFontSize),
                               )),
                               DataCell(
                                 Row(
@@ -311,10 +329,9 @@ class _ProductsState extends State<Products> {
                                       thickness: 0.7,
                                       color: Colors.grey,
                                       indent: 10,
-                                      endIndent:10,
+                                      endIndent: 10,
                                       width: 5,
                                     ),
-
                                     IconButton(
                                       onPressed: () async {
                                         _nameValidate = false;
@@ -324,7 +341,8 @@ class _ProductsState extends State<Products> {
                                             context,
                                             product['id'],
                                             product['name'],
-                                            product['wholesalePrice'].toString(),
+                                            product['wholesalePrice']
+                                                .toString(),
                                             product['salePrice'].toString(),
                                             'update');
                                         print(product['name']);

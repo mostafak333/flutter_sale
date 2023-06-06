@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'sqldb.dart';
 import 'navdrawer.dart';
 import 'constants.dart';
@@ -81,13 +82,13 @@ class _HomeState extends State<Home> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
           Widget backButton = TextButton(
-            child: Text("Cancel"),
+            child: Text("cancel".tr().toString()),
             onPressed: () {
               Navigator.of(context).pop();
             },
           );
           Widget confirmButton = TextButton(
-            child: Text("Ok"),
+            child: Text("ok".tr().toString()),
             onPressed: () {
               if (salePriceController.text.isEmpty) {
                 setState(() {
@@ -100,14 +101,14 @@ class _HomeState extends State<Home> {
             },
           );
           return AlertDialog(
-            title: Text('Update Sold Price'),
+            title: Text("update_selling_price".tr().toString()),
             content: SingleChildScrollView(
               child: Column(
                 children: [
                   TextField(
                     controller: salePriceController,
-                    decoration: InputDecoration(hintText: "Enter sold price",
-                      errorText: _validate ? "Can`t Be Empty" : null,
+                    decoration: InputDecoration(hintText: "enter_selling_price".tr().toString(),
+                      errorText: _validate ? "can_not_be_empty".tr().toString(): null,
                     ),
                     keyboardType: TextInputType.number,
 
@@ -131,33 +132,33 @@ class _HomeState extends State<Home> {
           return StatefulBuilder(builder: (context, setState) {
             TextEditingController _text = TextEditingController(); // Create a new TextEditingController
             Widget backButton = TextButton(
-              child: Text("Cancel"),
+              child: Text("cancel".tr().toString()),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             );
             Widget confirmButton = TextButton(
-                child: Text("Ok"),
+                child: Text("ok".tr().toString()),
                 onPressed: () {
-                  if (_text.text == 'sure') {
+                  if (_text.text == 'sure'.tr().toString()) {
                     delete($id);
                     Navigator.of(context).pop();
-                  } else if (_text.text != 'sure') {
+                  } else if (_text.text != 'sure'.tr().toString()) {
                     setState(() {
                       _validate = true;
                     });
                   }
                 });
             return AlertDialog(
-              title: Text('Delete Sale Row'),
+              title: Text('delete_Sold_item'.tr().toString()),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
                     TextField(
                       controller: _text,
                       decoration: InputDecoration(
-                        hintText: "Enter \'sure\'",
-                        errorText: _validate ? "Please Write \'sure\'" : null,
+                        hintText: "enter_sure".tr().toString(),
+                        errorText: _validate ? "please_write_sure".tr().toString() : null,
                       ),
                     ),
                   ],
@@ -198,7 +199,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: NavDrawer(),
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text("home".tr().toString()),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -221,21 +222,21 @@ class _HomeState extends State<Home> {
                       columns: [
                         DataColumn(
                                 label: Text(
-                                  'Name',
+                                  "name".tr().toString(),
                                   style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
                                       color: tableHeaderTitleColor
                                   ),
                                 )),
                         DataColumn(
                                 label: Text(
-                                  'Price',
+                                  "selling_price".tr().toString(),
                                   style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
                                       color: tableHeaderTitleColor
                                   ),
                                 )),
                         DataColumn(
                                 label: Text(
-                                  'Action',
+                                  'action'.tr().toString(),
                                   style: TextStyle(fontSize: tableTitleFontSize, fontWeight: FontWeight.bold,
                                       color: tableHeaderTitleColor
                                   ),
