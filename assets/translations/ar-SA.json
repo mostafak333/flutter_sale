@@ -26,11 +26,15 @@
   "ok" : "تأكيد",
   "cancel" : "إلغاء",
   "update_product" : "تعديل المنتج",
-  "delete_product" : "حذف المنتج",
+  "lock_product" : "غلق المنتج",
+  "unlock_product" : "فتح المنتج",
   "sure": "موافق",
   "enter_sure" : "أدخل موافق",
   "please_write_sure": "أكتب كلمة موافق",
   "update_selling_price" : "تعديل سعر البيع",
   "can_not_be_empty" : "لا يمكن أن يكون فارغاً",
-  "data":"البيانات"
+  "data":"البيانات",
+  "locked": "مغلق",
+  "unlocked": "متاح",
+  "status": "الحالة"
 }

@@ -33,6 +33,7 @@ class SqlDb {
     "name" VARCHAR(255) NOT NULL,
     "wholesalePrice" DECIMAL(10,2) NOT NULL,
     "salePrice" DECIMAL(10,2) NOT NULL,
+    "locked" INTEGER DEFAULT 0,
     "created_at" timestamp DATE DEFAULT (datetime('now','localtime'))
     )
     ''');

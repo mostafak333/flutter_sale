@@ -31,7 +31,11 @@ class _HomeState extends State<Home> {
 
   void fetchProductList() async {
     List<Map> response =
-        await sqlDb.readData("SELECT * FROM 'products' ORDER BY id DESC ");
+        await sqlDb.readData('''
+        SELECT * FROM 'products' 
+        WHERE locked <> 1
+        ORDER BY id DESC 
+        ''');
     setState(() {
       productList = response;
     });

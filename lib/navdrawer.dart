@@ -19,7 +19,7 @@ class _NavDrawerState extends State<NavDrawer> {
     await sqlDb.dropDataBase();
   }
 
-  _displaylanguageDialog(BuildContext context) async {
+  _displayLanguageDialog(BuildContext context) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -108,7 +108,7 @@ class _NavDrawerState extends State<NavDrawer> {
             leading: Icon(Icons.input),
             title: Text("language".tr().toString()),
             onTap: () async {
-              _displaylanguageDialog(context);
+              _displayLanguageDialog(context);
             },
           ),
         ],

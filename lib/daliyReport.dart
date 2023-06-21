@@ -14,6 +14,7 @@ class DailyReport extends StatefulWidget {
 class _DailyReportState extends State<DailyReport> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
+  List<DateTime> dates = [];
   List<Map> sellingProducts = [];
   var totalMoney, wholesalePrice, netProfit, sellingPrice;
   Color tableHeaderColor = Constants.tableHeaderColor;
@@ -21,14 +22,16 @@ class _DailyReportState extends State<DailyReport> {
   double tableContentFontSize = Constants.tableContentFontSize;
   double tableTitleFontSize = Constants.tableTitleFontSize;
   static const double paddingSize = Constants.padding;
+  String lastDateValue =  DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
 
   @override
   void initState() {
     super.initState();
     fetchMonthlyReport();
     fetchTotalMoney();
-    getSellingProductDate();
-    getIMoneyData();
+    fetchDatesFromDatabase();
+    getSellingProductFormDate(lastDateValue);
+    getIMoneyData(lastDateValue);
   }
 
   void fetchMonthlyReport() async {
@@ -52,14 +55,12 @@ class _DailyReportState extends State<DailyReport> {
     });
   }
 
-  void getIMoneyData() async {
-    var response = await sqlDb.readData(
-      "SELECT sum(sold_price) AS selling_price,"
-      "sum(products.wholesalePrice) AS wholesale_price,"
-      "sum(sold_price)- sum(products.wholesalePrice)as net_profit "
-      "FROM sales "
-      "INNER JOIN products ON sales.product_id=products.id "
-      "WHERE DATE(sales.created_at) = Date('now','localtime')",
+  void getIMoneyData(date) async {
+    var response = await sqlDb.readData('''
+      SELECT sum(sold_price) AS selling_price, sum(products.wholesalePrice) AS wholesale_price ,sum(sold_price)- sum(products.wholesalePrice)as net_profit
+      FROM sales
+      INNER JOIN products ON sales.product_id = products.id 
+      WHERE DATE(sales.created_at) = DATE('$date','localtime')'''
     );
     setState(() {
       sellingPrice = response.first['selling_price'];
@@ -68,19 +69,75 @@ class _DailyReportState extends State<DailyReport> {
     });
   }
 
-  void getSellingProductDate() async {
-    var response = await sqlDb.readData("SELECT products.name As name,"
-        "COUNT() AS number_of_selling "
-        "FROM sales "
-        "INNER JOIN products ON sales.product_id = products.id "
-        "WHERE DATE(sales.created_at) = Date('now','localtime') "
-        "GROUP BY product_id "
-        "ORDER BY number_of_selling DESC");
+  void getSellingProductFormDate(date) async {
+    var response = await sqlDb.readData('''
+    SELECT products.name As name,
+        COUNT() AS number_of_selling
+        FROM sales 
+        INNER JOIN products ON sales.product_id = products.id 
+        WHERE DATE(sales.created_at) = Date('$date','localtime') 
+        GROUP BY product_id 
+        ORDER BY number_of_selling DESC
+        ''');
     setState(() {
       sellingProducts = response;
     });
   }
+  void fetchDatesFromDatabase() async {
+    var response = await sqlDb.readData('''
+    SELECT created_at AS all_dates FROM sales
+    ''');
+    setState(() {
+      if(response != null){
+        dates = response
+            .map<DateTime>((date) => DateTime.parse(date['all_dates']))
+            .toList();
+        lastDateValue = (dates.last.toString()).substring(0, 10);
+      }
+    });
+  }
 
+  Future<void> _showDatePicker(BuildContext context) async {
+      final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: dates.last, // Use the selectedDate as the initial date
+        firstDate: dates.first, // Set the desired range of dates
+        lastDate: DateTime.now(),
+      );
+
+    if (pickedDate != null) {
+      setState(() {
+        dates.last = pickedDate;
+        lastDateValue = (dates.last.toString()).substring(0, 10);
+        getIMoneyData(lastDateValue);
+        getSellingProductFormDate(lastDateValue);
+      });
+    }
+  }
+  /*
+  //this is month date picker
+  Future<void> _showDatePicker(BuildContext context) async {
+    final DateTime? pickedDate = await showMonthPicker(
+      context: context,
+      initialDate: DateTime.now(),
+    ).then((date) {
+      if (date != null) {
+        setState(() {
+          print(date);
+
+        });
+      }
+    });
+
+    if (pickedDate != null) {
+      setState(() {
+        dates.last = pickedDate;
+        lastDateValue = (dates.last.toString()).substring(0, 10);
+        getIMoneyData(lastDateValue);
+        getSellingProductFormDate(lastDateValue);
+      });
+    }
+  }*/
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -132,13 +189,21 @@ class _DailyReportState extends State<DailyReport> {
                       DataRow(cells: [
                         DataCell(Text("date".tr().toString(),
                             style: TextStyle(
-                                fontSize: tableTitleFontSize,
+                                fontSize: tableContentFontSize,
                                 fontWeight: FontWeight.bold))),
                         DataCell(
-                            Text(DateTime.now().toIso8601String().split('T')[0],
-                                style: TextStyle(
-                                  fontSize: tableTitleFontSize,
-                                ))),
+                          TextButton(
+                            onPressed: () {
+                              _showDatePicker(context);
+                            },
+                            child: Text(
+                              lastDateValue,
+                              style: TextStyle(
+                                fontSize: tableContentFontSize,
+                              ),
+                            ),
+                          ),
+                        ),
                       ]),
                       DataRow(cells: [
                         DataCell(Text("total_selling_price".tr().toString(),
@@ -179,6 +244,9 @@ class _DailyReportState extends State<DailyReport> {
                               fontSize: tableContentFontSize,
                             ))),
                       ]),
+
+
+
                       for (var index = 0;
                           index < sellingProducts.length;
                           index++)

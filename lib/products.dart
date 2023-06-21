@@ -51,9 +51,16 @@ class _ProductsState extends State<Products> {
     }
   }
 
-  void update(id, name, wholesalePrice, salePrice) async {
+  void update(id, name, wholesalePrice, salePrice, locked) async {
     int response = await sqlDb.updateData(
-        "UPDATE products SET name = '$name', wholesalePrice = $wholesalePrice, salePrice = $salePrice WHERE id = $id");
+        '''
+        UPDATE products 
+        SET name = '$name',
+        wholesalePrice = $wholesalePrice,
+        salePrice = $salePrice,
+        locked = $locked 
+        WHERE id = $id
+        ''');
     if (response > 0) {
       fetchProductList();
     }
@@ -106,10 +113,12 @@ class _ProductsState extends State<Products> {
                         salePriceController.text);
                   } else {
                     update(
-                        $id,
-                        productNameController.text.toString(),
-                        wholesalePriceController.text,
-                        salePriceController.text);
+                      $id,
+                      productNameController.text.toString(),
+                      wholesalePriceController.text,
+                      salePriceController.text,
+                      null
+                    );
                   }
                   Navigator.of(context).pop();
                 }
@@ -163,7 +172,14 @@ class _ProductsState extends State<Products> {
         });
   }
 
-  _displayDeleteDialog(BuildContext context, $id) async {
+  _displayLockDialog(BuildContext context, $id, $name, $wholesalePrice, $salePrice, $locked
+      ) async {
+    TextEditingController productNameController =
+    TextEditingController(text: $name);
+    TextEditingController wholesalePriceController =
+    TextEditingController(text: $wholesalePrice);
+    TextEditingController salePriceController =
+    TextEditingController(text: $salePrice);
     return showDialog(
         context: context,
         builder: (context) {
@@ -180,7 +196,13 @@ class _ProductsState extends State<Products> {
                 child: Text("ok".tr().toString()),
                 onPressed: () {
                   if (_text.text == 'sure') {
-                    delete($id);
+                    update(
+                        $id,
+                        productNameController.text.toString(),
+                        wholesalePriceController.text,
+                        salePriceController.text,
+                        $locked == 1 ? 0 : 1
+                    );
                     Navigator.of(context).pop();
                   } else if (_text.text != 'sure') {
                     setState(() {
@@ -189,7 +211,7 @@ class _ProductsState extends State<Products> {
                   }
                 });
             return AlertDialog(
-              title: Text("delete_product".tr().toString()),
+              title: Text($locked == 1 ? "unlock_product".tr().toString():"lock_product".tr().toString()),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -284,12 +306,20 @@ class _ProductsState extends State<Products> {
                           )),
                           DataColumn(
                               label: Text(
-                            "action".tr().toString(),
+                            "status".tr().toString(),
                             style: TextStyle(
                                 fontSize: tableTitleFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: tableHeaderTitleColor),
                           )),
+                          DataColumn(
+                              label: Text(
+                                "action".tr().toString(),
+                                style: TextStyle(
+                                    fontSize: tableTitleFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: tableHeaderTitleColor),
+                              )),
                         ],
                         rows: [
                           for (var product in productList)
@@ -310,45 +340,64 @@ class _ProductsState extends State<Products> {
                                 product['salePrice'].toString(),
                                 textAlign: TextAlign.center,
                                 style:
-                                    TextStyle(fontSize: tableContentFontSize),
+                                TextStyle(fontSize: tableContentFontSize),
+                              )),
+                              DataCell(Text(
+                                product['locked'] == 1 ? "locked".tr().toString() : "unlocked".tr().toString(),
+                                textAlign: TextAlign.center,
+                                style:
+                                TextStyle(fontSize: tableContentFontSize),
                               )),
                               DataCell(
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        _deleteValidate = false;
-                                        _displayDeleteDialog(
-                                            context, product['id']);
-                                      },
-                                      icon: Icon(Icons.delete),
-                                      color: Colors.red,
+                                    Visibility(
+                                      visible: product['locked'] == 0,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          _nameValidate = false;
+                                          _wholesalePriceValidate = false;
+                                          _salePriceValidate = false;
+                                          _displayDialog(
+                                              context,
+                                              product['id'],
+                                              product['name'],
+                                              product['wholesalePrice'].toString(),
+                                              product['salePrice'].toString(),
+                                              'update');
+                                        },
+                                        icon: Icon(Icons.edit),
+                                        color: Colors.blue,
+                                      ),
                                     ),
-                                    VerticalDivider(
-                                      thickness: 0.7,
-                                      color: Colors.grey,
-                                      indent: 10,
-                                      endIndent: 10,
-                                      width: 5,
+                                    Visibility(
+                                      visible: product['locked'] == 0,
+                                      child: VerticalDivider(
+                                        thickness: 0.7,
+                                        color: Colors.grey,
+                                        indent: 10,
+                                        endIndent: 10,
+                                        width: 5,
+                                      ),
                                     ),
                                     IconButton(
-                                      onPressed: () async {
-                                        _nameValidate = false;
-                                        _wholesalePriceValidate = false;
-                                        _salePriceValidate = false;
-                                        _displayDialog(
-                                            context,
-                                            product['id'],
-                                            product['name'],
-                                            product['wholesalePrice']
-                                                .toString(),
-                                            product['salePrice'].toString(),
-                                            'update');
-                                        print(product['name']);
-                                      },
-                                      icon: Icon(Icons.edit),
-                                      color: Colors.blue,
+                                        onPressed: () async {
+                                          _nameValidate = false;
+                                          _wholesalePriceValidate = false;
+                                          _salePriceValidate = false;
+                                          _displayLockDialog(
+                                              context,
+                                              product['id'],
+                                              product['name'],
+                                              product['wholesalePrice'].toString(),
+                                              product['salePrice'].toString(),
+                                              product['locked']
+                                          );
+                                        },
+
+                                      icon: Icon(product['locked'] == 1 ? Icons.lock_open : Icons.lock),
+                                      color: product['locked'] == 1 ?Colors.green :Colors.red ,
                                     ),
                                   ],
                                 ),
