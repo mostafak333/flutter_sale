@@ -3,15 +3,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:business_application/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'constants.dart';
 import 'sqldb.dart';
+import 'package:intl/intl.dart';
 
-class DailyReport extends StatefulWidget {
+class MonthlyReport extends StatefulWidget {
   @override
-  _DailyReportState createState() => _DailyReportState();
+  _MonthlyReportState createState() => _MonthlyReportState();
 }
 
-class _DailyReportState extends State<DailyReport> {
+class _MonthlyReportState extends State<MonthlyReport> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
   List<DateTime> dates = [];
@@ -22,45 +24,29 @@ class _DailyReportState extends State<DailyReport> {
   double tableContentFontSize = Constants.tableContentFontSize;
   double tableTitleFontSize = Constants.tableTitleFontSize;
   static const double paddingSize = Constants.padding;
-  String lastDateValue =  DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
+  DateTime dateValue = DateTime.now();
+  String? monthName;
+  String? languageCode;
 
   @override
-  void initState() {
-    super.initState();
-    fetchMonthlyReport();
-    fetchTotalMoney();
-    fetchDatesFromDatabase();
-    getSellingProductFormDate(lastDateValue);
-    getIMoneyData(lastDateValue);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = EasyLocalization.of(context)?.locale;
+    languageCode = locale!.languageCode;
+    monthName = DateFormat.MMMM(languageCode).format(dateValue).toString();
+
+    getSellingProductFormDate(dateValue);
+    getIMoneyData(dateValue);
   }
 
-  void fetchMonthlyReport() async {
-    List<Map> response =
-        await sqlDb.readData("SELECT count(product_id) as products_count,"
-            "sum(sold_price) as price_sum,"
-            "DATE(created_at) as date"
-            " FROM sales"
-            " GROUP BY DATE(created_at);");
-    setState(() {
-      reportList = response;
-    });
-  }
-
-  void fetchTotalMoney() async {
-    var response = await sqlDb.readData(
-      "SELECT SUM(sold_price) AS price_sum FROM sales",
-    );
-    setState(() {
-      totalMoney = response.first['price_sum'];
-    });
-  }
 
   void getIMoneyData(date) async {
     var response = await sqlDb.readData('''
       SELECT sum(sold_price) AS selling_price, sum(products.wholesalePrice) AS wholesale_price ,sum(sold_price)- sum(products.wholesalePrice)as net_profit
       FROM sales
       INNER JOIN products ON sales.product_id = products.id 
-      WHERE DATE(sales.created_at) = DATE('$date','localtime')'''
+        WHERE strftime('%Y-%m', sales.created_at) = strftime('%Y-%m','$date','localtime')
+      '''
     );
     setState(() {
       sellingPrice = response.first['selling_price'];
@@ -75,7 +61,7 @@ class _DailyReportState extends State<DailyReport> {
         COUNT() AS number_of_selling
         FROM sales 
         INNER JOIN products ON sales.product_id = products.id 
-        WHERE DATE(sales.created_at) = Date('$date','localtime') 
+        WHERE strftime('%Y-%m', sales.created_at) = strftime('%Y-%m','$date','localtime')
         GROUP BY product_id 
         ORDER BY number_of_selling DESC
         ''');
@@ -84,64 +70,24 @@ class _DailyReportState extends State<DailyReport> {
     });
   }
 
-  void fetchDatesFromDatabase() async {
-    var response = await sqlDb.readData('''
-    SELECT created_at AS all_dates FROM sales
-    ''');
-    setState(() {
-      if(response != null){
-        dates = response
-            .map<DateTime>((date) => DateTime.parse(date['all_dates']))
-            .toList();
-        print(response);
-        lastDateValue = (dates.last.toString()).substring(0, 10);
-        print(dates.first.toString());
-        print(dates.last.toString());
-      }
-    });
-  }
-
   Future<void> _showDatePicker(BuildContext context) async {
-      final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: dates.last, // Use the selectedDate as the initial date
-        firstDate: dates.first, // Set the desired range of dates
-        lastDate: DateTime.now(),
-      );
-
-    if (pickedDate != null) {
-      setState(() {
-        dates.last = pickedDate;
-        lastDateValue = (dates.last.toString()).substring(0, 10);
-        getIMoneyData(lastDateValue);
-        getSellingProductFormDate(lastDateValue);
-      });
-    }
-  }
-  /*
-  //this is month date picker
-  Future<void> _showDatePicker(BuildContext context) async {
-    final DateTime? pickedDate = await showMonthPicker(
+     await showMonthPicker(
       context: context,
       initialDate: DateTime.now(),
     ).then((date) {
       if (date != null) {
         setState(() {
-          print(date);
-
+          dateValue = date;
+          monthName = DateFormat.MMMM(languageCode).format(date).toString();
         });
       }
     });
-
-    if (pickedDate != null) {
       setState(() {
-        dates.last = pickedDate;
-        lastDateValue = (dates.last.toString()).substring(0, 10);
-        getIMoneyData(lastDateValue);
-        getSellingProductFormDate(lastDateValue);
+        getIMoneyData(dateValue);
+        getSellingProductFormDate(dateValue);
       });
-    }
-  }*/
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -151,7 +97,7 @@ class _DailyReportState extends State<DailyReport> {
         },
         child: Scaffold(
           appBar: AppBar(
-              title: Text("daily_report".tr().toString()),
+              title: Text("monthly_report".tr().toString()),
               leading: new IconButton(
                   icon: new Icon(Icons.arrow_back),
                   onPressed: () {
@@ -201,7 +147,7 @@ class _DailyReportState extends State<DailyReport> {
                               _showDatePicker(context);
                             },
                             child: Text(
-                              lastDateValue,
+                              monthName.toString(),
                               style: TextStyle(
                                 fontSize: tableContentFontSize,
                               ),

@@ -1,9 +1,10 @@
 import 'package:business_application/daliyReport.dart';
 import 'package:business_application/home.dart';
 import 'package:business_application/products.dart';
-import 'package:business_application/report.dart';
+import 'package:business_application/listedDailyReport.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:business_application/monthlyReport.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -30,8 +31,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Home(),
         '/products': (context) => Products(),
-        '/report': (context) => Report(),
+        '/report': (context) => ListedDailyReport(),
         '/daily-report': (context) => DailyReport(),
+        '/monthly-report': (context) => MonthlyReport(),
       },
     );
   }

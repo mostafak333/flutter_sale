@@ -4,12 +4,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'constants.dart';
 import 'sqldb.dart';
 
-class Report extends StatefulWidget {
+class ListedDailyReport extends StatefulWidget {
   @override
-  _ReportState createState() => _ReportState();
+  _ListedDailyReportState createState() => _ListedDailyReportState();
 }
 
-class _ReportState extends State<Report> {
+class _ListedDailyReportState extends State<ListedDailyReport> {
   SqlDb sqlDb = SqlDb();
   List<Map> reportList = [];
   var totalMoney;
@@ -57,7 +57,7 @@ class _ReportState extends State<Report> {
         },
         child: Scaffold(
           appBar: AppBar(
-              title: Text("report".tr().toString()),
+              title: Text("list_daily_report".tr().toString()),
               leading: new IconButton(
                   icon: new Icon(Icons.arrow_back),
                   onPressed: () {
@@ -83,7 +83,7 @@ class _ReportState extends State<Report> {
                             leading:
                                 Icon(Icons.paid, color: Colors.white, size: 45),
                             title: Text(
-                              "report".tr().toString() +":"+ " $totalMoney ",
+                              "list_daily_report".tr().toString() +":"+ " $totalMoney ",
 
                               style: TextStyle(
                                   fontSize: 25,

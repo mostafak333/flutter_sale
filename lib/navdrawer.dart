@@ -1,5 +1,6 @@
+import 'package:business_application/monthlyReport.dart';
 import 'package:business_application/products.dart';
-import 'package:business_application/report.dart';
+import 'package:business_application/listedDailyReport.dart';
 import 'package:business_application/daliyReport.dart';
 import 'package:flutter/material.dart';
 import 'sqldb.dart';
@@ -91,10 +92,18 @@ class _NavDrawerState extends State<NavDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.input),
-            title: Text("report".tr().toString()),
+            title: Text("list_daily_report".tr().toString()),
             onTap: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => Report()));
+                  .push(MaterialPageRoute(builder: (context) => ListedDailyReport()));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.input),
+            title: Text("monthly_report".tr().toString()),
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => MonthlyReport()));
             },
           ),
           ListTile(

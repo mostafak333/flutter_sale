@@ -1,8 +1,9 @@
 {
     "menu": "Main Menu",
     "products": "Products",
-    "report": "Report",
+    "list_daily_report": "List Daily Report",
     "daily_report": "Daily Report",
+    "monthly_report" : "Monthly Report",
     "language": "language",
     "home": "Daily Sales",
     "name": "Name",
